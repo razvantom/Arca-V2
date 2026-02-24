@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: arca_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: arca
+      POSTGRES_PASSWORD: arca
+      POSTGRES_DB: arca
+    ports:
+      - "5432:5432"
+    volumes:
+      - arca_postgres_data:/var/lib/postgresql/data
+
+  mysql:
+    image: mysql:8.4
+    container_name: arca_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: arca_replica
+      MYSQL_USER: arca
+      MYSQL_PASSWORD: arca
+    ports:
+      - "3306:3306"
+    volumes:
+      - arca_mysql_data:/var/lib/mysql
+
+volumes:
+  arca_postgres_data:
+  arca_mysql_data:
