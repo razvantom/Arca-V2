@@ -18,6 +18,7 @@ backend/dist/
 mobile/.env
 
 # Prisma
+backend/prisma/migrations/
 backend/prisma/dev.db
 
 # OS
