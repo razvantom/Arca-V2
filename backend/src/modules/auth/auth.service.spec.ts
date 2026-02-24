@@ -1,7 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BadRequestException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { ConfigService } from "@nestjs/config";
 import { AuthService } from "./auth.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { RegisterDto } from "./dto/register.dto";
@@ -37,10 +36,6 @@ describe("AuthService – register geo chain validation", () => {
         {
           provide: JwtService,
           useValue: { signAsync: jest.fn().mockResolvedValue("mock-token") },
-        },
-        {
-          provide: ConfigService,
-          useValue: { get: jest.fn().mockReturnValue("7d") },
         },
       ],
     }).compile();
@@ -136,7 +131,7 @@ describe("AuthService – register geo chain validation", () => {
     expect(prisma.user.create).not.toHaveBeenCalled();
   });
 
-  it("should return accessToken and refreshToken on successful registration", async () => {
+  it("should return accessToken on successful registration", async () => {
     (prisma.organization.findUnique as jest.Mock).mockResolvedValue({
       id: 10,
       countyId: 1,
@@ -165,8 +160,8 @@ describe("AuthService – register geo chain validation", () => {
     const result = await service.register(validDto);
 
     expect(result).toHaveProperty("accessToken");
-    expect(result).toHaveProperty("refreshToken");
     expect(result).toHaveProperty("user");
+    expect(result).not.toHaveProperty("refreshToken");
     expect(prisma.user.create).toHaveBeenCalledTimes(1);
   });
 });

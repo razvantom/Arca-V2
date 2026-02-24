@@ -87,7 +87,7 @@ async function seedGeoFromExcel(excelPath: string) {
         create: { name: countyNameRaw, slug },
       });
       countyId = county.id;
-      countyCache.set(countyNameRaw, countyId!);
+      countyCache.set(countyNameRaw, countyId);
     }
 
     const orgKey = `${countyId}|${uatNameRaw}`;
@@ -99,7 +99,7 @@ async function seedGeoFromExcel(excelPath: string) {
         create: { countyId, name: uatNameRaw, siruta: siruta ?? undefined },
       });
       orgId = org.id;
-      orgCache.set(orgKey, orgId!);
+      orgCache.set(orgKey, orgId);
     }
 
     const locKey = `${orgId}|${localityNameRaw}`;
@@ -111,7 +111,7 @@ async function seedGeoFromExcel(excelPath: string) {
         create: { organizationId: orgId, name: localityNameRaw },
       });
       localityId = loc.id;
-      localityCache.set(locKey, localityId!);
+      localityCache.set(locKey, localityId);
     }
 
     await prisma.pollingSection.upsert({
