@@ -81,13 +81,11 @@ model UserProfile {
 }
 
 model Role {
-  id              Int                @id @default(autoincrement())
-  key             String             @unique
-  name            String
-  scopeType       RoleScopeType
-  sortOrder       Int                @default(0)
-
-  accessAssignments AccessAssignment[]
+  id        Int           @id @default(autoincrement())
+  key       String        @unique
+  name      String
+  scopeType RoleScopeType
+  sortOrder Int           @default(0)
 }
 
 model AccessAssignment {
@@ -115,28 +113,23 @@ model AccessAssignment {
 }
 
 model County {
-  id                  Int                    @id @default(autoincrement())
-  name                String                 @unique
-  slug                String                 @unique
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  slug          String         @unique
 
-  organizations       Organization[]
-  profiles            UserProfile[]
-  accessAssignments   AccessAssignment[]
-  leadershipAssignments LeadershipAssignment[]
+  organizations Organization[]
 }
 
 model Organization {
-  id                  Int                    @id @default(autoincrement())
-  countyId            Int
-  siruta              Int?
-  name                String
+  id          Int       @id @default(autoincrement())
+  countyId    Int
+  siruta      Int?
+  name        String
 
-  county              County                 @relation(fields: [countyId], references: [id])
-  localities          Locality[]
-  memberships         Membership[]
-  leadership          LeadershipAssignment[]
-  profiles            UserProfile[]
-  accessAssignments   AccessAssignment[]
+  county      County    @relation(fields: [countyId], references: [id])
+  localities  Locality[]
+  memberships Membership[]
+  leadership  LeadershipAssignment[]
 
   @@unique([countyId, name])
   @@index([countyId])
@@ -150,7 +143,6 @@ model Locality {
 
   organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   pollingSections PollingSection[]
-  profiles        UserProfile[]
 
   @@unique([organizationId, name])
   @@index([organizationId])
@@ -164,7 +156,6 @@ model PollingSection {
   name       String
 
   locality   Locality @relation(fields: [localityId], references: [id], onDelete: Cascade)
-  profiles   UserProfile[]
 
   @@unique([localityId, number])
   @@index([localityId])
@@ -209,21 +200,4 @@ model LeadershipAssignment {
   @@index([unitType])
   @@index([countyId])
   @@index([organizationId])
-}
-
-model AuditLog {
-  id             String   @id @default(uuid())
-  actorUserId    String?
-  action         String
-  entity         String
-  entityId       String?
-  scopeType      String?
-  countyId       Int?
-  organizationId Int?
-  meta           Json?
-  createdAt      DateTime @default(now())
-
-  @@index([actorUserId])
-  @@index([entity])
-  @@index([createdAt])
 }
