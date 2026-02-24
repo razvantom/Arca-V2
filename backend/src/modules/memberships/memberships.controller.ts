@@ -2,10 +2,10 @@ import { Controller, Get, Post, Param, Query, Req, UseGuards } from "@nestjs/com
 import { Request } from "express";
 import { MembershipsService, UserContext } from "./memberships.service";
 import { ListMembershipsDto } from "./dto/list-memberships.dto";
-import { AuthGuard } from "../../common/guards/auth.guard";
+import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { ScopeGuard } from "../../common/guards/scope.guard";
 
-@UseGuards(AuthGuard, ScopeGuard)
+@UseGuards(JwtAuthGuard, ScopeGuard)
 @Controller("/api/v1/memberships")
 export class MembershipsController {
   constructor(private memberships: MembershipsService) {}

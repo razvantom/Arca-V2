@@ -81,11 +81,11 @@ model UserProfile {
 }
 
 model Role {
-  id        Int           @id @default(autoincrement())
-  key       String        @unique
-  name      String
-  scopeType RoleScopeType
-  sortOrder Int           @default(0)
+  id              Int                @id @default(autoincrement())
+  key             String             @unique
+  name            String
+  scopeType       RoleScopeType
+  sortOrder       Int                @default(0)
 
   accessAssignments AccessAssignment[]
 }
@@ -115,28 +115,28 @@ model AccessAssignment {
 }
 
 model County {
-  id            Int            @id @default(autoincrement())
-  name          String         @unique
-  slug          String         @unique
+  id                  Int                    @id @default(autoincrement())
+  name                String                 @unique
+  slug                String                 @unique
 
-  organizations    Organization[]
-  profiles         UserProfile[]
-  accessAssignments AccessAssignment[]
-  leadership       LeadershipAssignment[]
+  organizations       Organization[]
+  profiles            UserProfile[]
+  accessAssignments   AccessAssignment[]
+  leadershipAssignments LeadershipAssignment[]
 }
 
 model Organization {
-  id          Int       @id @default(autoincrement())
-  countyId    Int
-  siruta      Int?
-  name        String
+  id                  Int                    @id @default(autoincrement())
+  countyId            Int
+  siruta              Int?
+  name                String
 
-  county      County    @relation(fields: [countyId], references: [id])
-  localities  Locality[]
-  memberships Membership[]
-  leadership  LeadershipAssignment[]
-  profiles    UserProfile[]
-  accessAssignments AccessAssignment[]
+  county              County                 @relation(fields: [countyId], references: [id])
+  localities          Locality[]
+  memberships         Membership[]
+  leadership          LeadershipAssignment[]
+  profiles            UserProfile[]
+  accessAssignments   AccessAssignment[]
 
   @@unique([countyId, name])
   @@index([countyId])
@@ -224,6 +224,6 @@ model AuditLog {
   createdAt      DateTime @default(now())
 
   @@index([actorUserId])
-  @@index([entity, entityId])
+  @@index([entity])
   @@index([createdAt])
 }
