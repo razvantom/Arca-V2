@@ -86,6 +86,8 @@ model Role {
   name      String
   scopeType RoleScopeType
   sortOrder Int           @default(0)
+
+  access    AccessAssignment[]
 }
 
 model AccessAssignment {
@@ -118,6 +120,9 @@ model County {
   slug          String         @unique
 
   organizations Organization[]
+  profiles      UserProfile[]
+  access        AccessAssignment[]
+  leadership    LeadershipAssignment[]
 }
 
 model Organization {
@@ -130,6 +135,8 @@ model Organization {
   localities  Locality[]
   memberships Membership[]
   leadership  LeadershipAssignment[]
+  profiles    UserProfile[]
+  access      AccessAssignment[]
 
   @@unique([countyId, name])
   @@index([countyId])
@@ -143,6 +150,7 @@ model Locality {
 
   organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   pollingSections PollingSection[]
+  profiles        UserProfile[]
 
   @@unique([organizationId, name])
   @@index([organizationId])
@@ -156,6 +164,7 @@ model PollingSection {
   name       String
 
   locality   Locality @relation(fields: [localityId], references: [id], onDelete: Cascade)
+  profiles   UserProfile[]
 
   @@unique([localityId, number])
   @@index([localityId])
@@ -200,4 +209,21 @@ model LeadershipAssignment {
   @@index([unitType])
   @@index([countyId])
   @@index([organizationId])
+}
+
+model AuditLog {
+  id             String   @id @default(uuid())
+  actorUserId    String?
+  action         String
+  entity         String
+  entityId       String?
+  scopeType      String?
+  countyId       Int?
+  organizationId Int?
+  meta           Json?
+  createdAt      DateTime @default(now())
+
+  @@index([actorUserId])
+  @@index([entity])
+  @@index([createdAt])
 }

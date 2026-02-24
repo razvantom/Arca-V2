@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "../../prisma/prisma.service";
 import { RegisterDto } from "./dto/register.dto";
@@ -7,7 +8,11 @@ import { LoginDto } from "./dto/login.dto";
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService, private jwt: JwtService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {}
 
   private async validateGeo(dto: RegisterDto) {
     const org = await this.prisma.organization.findUnique({ where: { id: dto.organizationId } });
@@ -70,7 +75,11 @@ export class AuthService {
     });
 
     const accessToken = await this.jwt.signAsync({ sub: user.id });
-    return { user, accessToken };
+    const refreshToken = await this.jwt.signAsync(
+      { sub: user.id },
+      { expiresIn: this.config.get<string>("JWT_REFRESH_EXPIRES_IN") || "7d" },
+    );
+    return { user, accessToken, refreshToken };
   }
 
   async login(dto: LoginDto) {
