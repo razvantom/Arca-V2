@@ -1,6 +1,11 @@
 # Web (Next.js)
 
-## Setup (dev)
-- `npm install`
-- `.env.local` (API base URL)
-- `npm run dev`
+## Setup
+```bash
+cd web
+cp .env.local.example .env.local
+npm install
+npm run dev
+```
+
+Rulează backend-ul înainte (default: http://localhost:3001).

@@ -1,18 +1,49 @@
-# Backend (NestJS)
+# Backend (NestJS + Prisma)
 
-## Setup (dev)
-1. Pornește DB-urile:
-   - `docker compose -f infrastructure/docker-compose.yml up -d`
+## Cerințe
+- Node.js 18+
+- Docker
 
-2. Instalează dependențe:
-   - `npm install`
+## 1) Pornește bazele de date (dev)
+Din rădăcina repo:
+```bash
+docker compose -f infrastructure/docker-compose.yml up -d
+```
 
-3. Configurează `.env`:
-   - `DATABASE_URL="postgresql://arca:arca@localhost:5432/arca"`
+## 2) Config `.env`
+În `backend/`, copiază:
+```bash
+cp .env.example .env
+```
 
-4. Prisma:
-   - `npx prisma migrate dev`
-   - `npx prisma generate`
+## 3) Instalează dependențe
+```bash
+cd backend
+npm install
+```
 
-5. Run:
-   - `npm run start:dev`
+## 4) Migrate + Seed (Județe/UAT/Localități/Secții de votare)
+Excel-ul trebuie să fie în:
+`backend/prisma/data/Judete-UAT-SectiiVOT.xlsx`
+
+Apoi:
+```bash
+npx prisma migrate dev
+npm run prisma:seed
+```
+
+## 5) Rulează API
+```bash
+npm run start:dev
+```
+
+## Endpoints utile
+- Health: `GET /api/v1/health`
+- Județe: `GET /api/v1/geo/counties`
+- UAT din județ: `GET /api/v1/geo/counties/:countyId/organizations`
+- Localități din UAT: `GET /api/v1/geo/organizations/:orgId/localities`
+- Secții din localitate: `GET /api/v1/geo/localities/:localityId/polling-sections`
+
+## Auth (MVP)
+- Register: `POST /api/v1/auth/register` (setează județ/UAT/localitate/secție)
+- Login: `POST /api/v1/auth/login`

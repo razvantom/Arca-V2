@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "ARCA v2",
+    "slug": "arca-v2",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "sdkVersion": "51.0.0"
+  }
+}

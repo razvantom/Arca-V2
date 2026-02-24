@@ -1,76 +1,49 @@
-# ARCA v2
+# ARCA v2 (Web + Android + iOS)
 
-Platformă națională de organizare (Web + Android + iOS)
-Arhitectură piramidală: Național → Filială (Județ) → Organizație → Membru
+Stack:
+- Backend: NestJS + Prisma (PostgreSQL primary)
+- Web: Next.js
+- Mobile: React Native Expo
+- Redundanță: MySQL replica (read-only) prin CDC (după MVP)
 
----
+## Quick start (dev)
 
-## 1) Arhitectură generală
+### 1) Pornește DB-urile
+```bash
+docker compose -f infrastructure/docker-compose.yml up -d
+```
 
-- Backend API (single source of truth)
-- PostgreSQL (Primary write DB)
-- MySQL (Replica read-only)
-- Web App (Admin + Dashboard)
-- Mobile App (Android + iOS)
-- CDC pipeline pentru replicare
+### 2) Backend (API)
+```bash
+cd backend
+cp .env.example .env
+npm install
+npx prisma migrate dev
+npm run prisma:seed
+npm run start:dev
+```
 
----
+### 3) Web
+```bash
+cd web
+cp .env.local.example .env.local
+npm install
+npm run dev
+```
 
-## 2) Structura repo
+### 4) Mobile
+```bash
+cd mobile
+cp .env.example .env
+npm install
+npx expo start
+```
 
-arca-v2/
-│
-├── backend/
-│   ├── src/
-│   │   ├── modules/
-│   │   │   ├── auth/
-│   │   │   ├── users/
-│   │   │   ├── counties/
-│   │   │   ├── organizations/
-│   │   │   ├── memberships/
-│   │   │   ├── leadership/
-│   │   │   ├── documents/
-│   │   │   ├── finance/
-│   │   │   ├── events/
-│   │   │   ├── surveys/
-│   │   │   ├── projects/
-│   │   │   ├── governance/
-│   │   │   └── audit/
-│   │   ├── common/
-│   │   ├── config/
-│   │   └── main.ts
-│   ├── prisma/ or migrations/
-│   ├── docker/
-│   └── README.md
-│
-├── web/
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   ├── layouts/
-│   │   └── services/
-│   ├── public/
-│   └── README.md
-│
-├── mobile/
-│   ├── app/
-│   │   ├── screens/
-│   │   ├── components/
-│   │   ├── navigation/
-│   │   └── services/
-│   └── README.md
-│
-├── infrastructure/
-│   ├── docker-compose.yml
-│   ├── postgres/
-│   ├── mysql/
-│   ├── cdc/
-│   └── monitoring/
-│
-├── docs/
-│   ├── 01-ARCA-Piramida-Aplicatiei.md
-│   ├── 02-ARCA-RBAC-Scope-Matrice.md
-│   ├── 03-Data-Redundancy-Strategy.md
-│   └── architecture-diagram.md
-│
-└── README.md
+## Date GEO (Județe/UAT/Localități/Secții)
+Fișierul Excel este inclus în:
+`backend/prisma/data/Judete-UAT-SectiiVOT.xlsx`
+
+Seed-ul îl importă în PostgreSQL.
+
+## Docs
+Vezi folderul `docs/` pentru arhitectură, RBAC/scope și redundanță.

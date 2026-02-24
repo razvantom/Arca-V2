@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum RoleScopeType {
+  GLOBAL
+  COUNTY
+  ORG
+  SELF
+}
+
+enum MembershipStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  SUSPENDED
+}
+
+enum UnitType {
+  NATIONAL
+  COUNTY
+  ORG
+}
+
+enum LeadershipFunction {
+  PRESIDENT
+  VICE_PRESIDENT
+  SECRETARY
+  TREASURER
+}
+
+model User {
+  id           String          @id @default(uuid())
+  email        String?         @unique
+  phone        String?         @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  status       UserStatus      @default(ACTIVE)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  profile      UserProfile?
+  access       AccessAssignment[]
+  memberships  Membership[]
+  approvals    Membership[]    @relation("membership_approver")
+  leadership   LeadershipAssignment[]
+}
+
+model UserProfile {
+  userId           String  @id
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  countyId         Int
+  organizationId   Int
+  localityId       Int
+  pollingSectionId Int
+
+  county           County         @relation(fields: [countyId], references: [id])
+  organization     Organization   @relation(fields: [organizationId], references: [id])
+  locality         Locality       @relation(fields: [localityId], references: [id])
+  pollingSection   PollingSection @relation(fields: [pollingSectionId], references: [id])
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([countyId])
+  @@index([organizationId])
+  @@index([localityId])
+  @@index([pollingSectionId])
+}
+
+model Role {
+  id        Int           @id @default(autoincrement())
+  key       String        @unique
+  name      String
+  scopeType RoleScopeType
+  sortOrder Int           @default(0)
+}
+
+model AccessAssignment {
+  id             String        @id @default(uuid())
+  userId         String
+  roleId         Int
+
+  countyId       Int?
+  organizationId Int?
+
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           Role          @relation(fields: [roleId], references: [id])
+  county         County?       @relation(fields: [countyId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  startAt        DateTime      @default(now())
+  endAt          DateTime?
+
+  createdAt      DateTime      @default(now())
+
+  @@index([userId])
+  @@index([roleId])
+  @@index([countyId])
+  @@index([organizationId])
+}
+
+model County {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  slug          String         @unique
+
+  organizations Organization[]
+}
+
+model Organization {
+  id          Int       @id @default(autoincrement())
+  countyId    Int
+  siruta      Int?
+  name        String
+
+  county      County    @relation(fields: [countyId], references: [id])
+  localities  Locality[]
+  memberships Membership[]
+  leadership  LeadershipAssignment[]
+
+  @@unique([countyId, name])
+  @@index([countyId])
+  @@index([siruta])
+}
+
+model Locality {
+  id              Int       @id @default(autoincrement())
+  organizationId  Int
+  name            String
+
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pollingSections PollingSection[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model PollingSection {
+  id         Int      @id @default(autoincrement())
+  localityId Int
+  number     Int
+  code       String?
+  name       String
+
+  locality   Locality @relation(fields: [localityId], references: [id], onDelete: Cascade)
+
+  @@unique([localityId, number])
+  @@index([localityId])
+  @@index([code])
+}
+
+model Membership {
+  id             String           @id @default(uuid())
+  userId         String
+  organizationId Int
+  status         MembershipStatus @default(PENDING)
+
+  appliedAt      DateTime         @default(now())
+  approvedAt     DateTime?
+  approvedById   String?
+
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization     @relation(fields: [organizationId], references: [id])
+  approvedBy     User?            @relation("membership_approver", fields: [approvedById], references: [id])
+
+  @@unique([userId, organizationId])
+  @@index([organizationId])
+  @@index([status])
+}
+
+model LeadershipAssignment {
+  id             String              @id @default(uuid())
+  userId         String
+  unitType       UnitType
+  countyId       Int?
+  organizationId Int?
+  function       LeadershipFunction
+
+  startAt        DateTime            @default(now())
+  endAt          DateTime?
+
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  county         County?             @relation(fields: [countyId], references: [id])
+  organization   Organization?       @relation(fields: [organizationId], references: [id])
+
+  @@index([userId])
+  @@index([unitType])
+  @@index([countyId])
+  @@index([organizationId])
+}
