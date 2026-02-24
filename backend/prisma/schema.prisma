@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ScopeType {
+  GLOBAL
+  COUNTY
+  ORG
+  SELF
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  fullName     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roleAssignments RoleAssignment[]
+  memberships     Membership[]
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  assignments RoleAssignment[]
+}
+
+model RoleAssignment {
+  id        String    @id @default(cuid())
+  userId    String
+  roleId    String
+  scopeType ScopeType @default(SELF)
+  countyId  String?
+  orgId     String?
+  createdAt DateTime  @default(now())
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  county County? @relation(fields: [countyId], references: [id])
+  org    Organization? @relation(fields: [orgId], references: [id])
+
+  @@index([userId])
+  @@index([roleId])
+  @@index([scopeType, countyId, orgId])
+}
+
+model County {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  orgs Organization[]
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  countyId  String
+  name      String
+  uatCode   String?
+  createdAt DateTime @default(now())
+
+  county County @relation(fields: [countyId], references: [id])
+  memberships Membership[]
+
+  @@index([countyId])
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  userId    String
+  orgId     String
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+  @@index([orgId])
+}
