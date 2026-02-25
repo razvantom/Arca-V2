@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://arca:arca@localhost:5432/arca
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: arca
+          POSTGRES_PASSWORD: arca
+          POSTGRES_DB: arca
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U arca"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+        working-directory: backend
+      - name: Prisma generate
+        run: npx prisma generate
+        working-directory: backend
+      - name: Prisma migrate deploy
+        run: npx prisma migrate deploy
+        working-directory: backend
+      - name: Run tests
+        run: npm test
+        working-directory: backend
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+        working-directory: web
+      - name: Build
+        run: npm run build
+        working-directory: web
+
+  mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+        working-directory: mobile
