@@ -3,8 +3,11 @@ import * as bcrypt from "bcrypt";
 import * as path from "path";
 import * as fs from "fs";
 import * as XLSX from "xlsx";
+import * as bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
+const ADMIN_EMAIL = "admin@arca.local";
+const ADMIN_PASSWORD = "Admin123!";
 
 function slugify(input: string) {
   return input
@@ -17,6 +20,7 @@ function slugify(input: string) {
 
 async function seedRoles() {
   const roles = [
+    { key: "SUPER_ADMIN", name: "Super Admin", scopeType: "GLOBAL", sortOrder: -10 },
     { key: "ADMIN_ARCA", name: "Admini ARCA", scopeType: "GLOBAL", sortOrder: 0 },
 
     { key: "COUNTY_PRESIDENT", name: "Președinte filială", scopeType: "COUNTY", sortOrder: 10 },
@@ -43,35 +47,30 @@ async function seedRoles() {
 }
 
 async function seedAdminUser() {
-  const adminRole = await prisma.role.findUnique({ where: { key: "ADMIN_ARCA" } });
-  if (!adminRole) throw new Error("ADMIN_ARCA role missing. Run seedRoles first.");
+  const role = await prisma.role.findUnique({ where: { key: "SUPER_ADMIN" } });
+  if (!role) throw new Error("SUPER_ADMIN role not found. Run seed roles first.");
 
-  const passwordHash = await bcrypt.hash("Admin123!", 10);
-  const adminUser = await prisma.user.upsert({
-    where: { email: "admin@arca.local" },
-    update: {
-      passwordHash,
-      firstName: "Admin",
-      lastName: "ARCA",
-      status: "ACTIVE",
-    },
-    create: {
-      email: "admin@arca.local",
-      passwordHash,
-      firstName: "Admin",
-      lastName: "ARCA",
-      status: "ACTIVE",
-    },
-    select: { id: true },
+  const existing = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+  let adminUser = existing;
+  if (!adminUser) {
+    const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+    adminUser = await prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        passwordHash,
+        firstName: "Admin",
+        lastName: "User",
+      },
+    });
+  }
+  if (!adminUser) throw new Error("Admin user could not be created.");
+
+  const access = await prisma.accessAssignment.findFirst({
+    where: { userId: adminUser.id, roleId: role.id, endAt: null },
   });
-
-  const existingAccess = await prisma.accessAssignment.findFirst({
-    where: { userId: adminUser.id, roleId: adminRole.id, endAt: null },
-  });
-
-  if (!existingAccess) {
+  if (!access) {
     await prisma.accessAssignment.create({
-      data: { userId: adminUser.id, roleId: adminRole.id },
+      data: { userId: adminUser.id, roleId: role.id },
     });
   }
 }
