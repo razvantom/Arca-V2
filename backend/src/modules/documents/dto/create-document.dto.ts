@@ -10,7 +10,6 @@ export const ALLOWED_DOCUMENT_MIME_TYPES = [
   "image/png",
   "image/jpeg",
 ] as const;
-export const ALLOWED_DOCUMENT_MIME_TYPES_SET = new Set<string>(ALLOWED_DOCUMENT_MIME_TYPES);
 
 export class CreateDocumentDto {
   @IsString()

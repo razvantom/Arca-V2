@@ -16,15 +16,14 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
 import { DocumentsService, UserContext } from "./documents.service";
-import {
-  ALLOWED_DOCUMENT_MIME_TYPES_SET,
-  CreateDocumentDto,
-} from "./dto/create-document.dto";
+import { ALLOWED_DOCUMENT_MIME_TYPES, CreateDocumentDto } from "./dto/create-document.dto";
 import { UpdateDocumentDto } from "./dto/update-document.dto";
 import { ListDocumentsDto } from "./dto/list-documents.dto";
 import { StorageService, UploadFile } from "./storage.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { ScopeGuard } from "../../common/guards/scope.guard";
+
+const ALLOWED_DOCUMENT_MIME_TYPES_SET = new Set<string>(ALLOWED_DOCUMENT_MIME_TYPES);
 
 @UseGuards(JwtAuthGuard, ScopeGuard)
 @Controller("/api/v1/documents")

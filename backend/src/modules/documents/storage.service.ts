@@ -35,7 +35,6 @@ export class StorageService {
     if (!file.buffer) throw new BadRequestException("Invalid file payload");
 
     const uploadsDir = this.getUploadsDir();
-    if (!uploadsDir) throw new BadRequestException("Uploads directory not configured");
 
     await fs.mkdir(uploadsDir, { recursive: true });
 
@@ -48,7 +47,7 @@ export class StorageService {
     return {
       fileUrl: `${this.getPublicPath()}/${filename}`,
       mimeType: file.mimetype,
-      sizeBytes: file.size ?? file.buffer.length,
+      sizeBytes: file.buffer.length,
     };
   }
 }

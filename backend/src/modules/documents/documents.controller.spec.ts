@@ -20,12 +20,20 @@ describe("DocumentsController upload", () => {
     uploadsDir = await mkdtemp(join(tmpdir(), "arca-uploads-"));
     process.env.UPLOADS_DIR = uploadsDir;
 
+    const documentsServiceMock = {
+      create: jest.fn(),
+      list: jest.fn(),
+      get: jest.fn(),
+      update: jest.fn(),
+      remove: jest.fn(),
+    };
+
     const moduleRef = await Test.createTestingModule({
       imports: [ConfigModule.forRoot({ isGlobal: true, load: [uploadsConfig] })],
       controllers: [DocumentsController],
       providers: [
         StorageService,
-        { provide: DocumentsService, useValue: {} },
+        { provide: DocumentsService, useValue: documentsServiceMock },
       ],
     })
       .overrideGuard(JwtAuthGuard)
