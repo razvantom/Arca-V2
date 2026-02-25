@@ -10,7 +10,14 @@ export const ALLOWED_DOCUMENT_MIME_TYPES = [
   "image/png",
   "image/jpeg",
 ] as const;
-export const UPLOADS_FILE_URL_REGEX = /^\/uploads\/[a-f0-9-]+(\.[a-z0-9]+)?$/i;
+export const DOCUMENT_MIME_TYPE_EXTENSIONS: Record<(typeof ALLOWED_DOCUMENT_MIME_TYPES)[number], string[]> =
+  {
+    "application/pdf": [".pdf"],
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+    "image/png": [".png"],
+    "image/jpeg": [".jpg", ".jpeg"],
+  };
+export const UPLOADS_FILE_URL_REGEX = /^\/uploads\/[a-f0-9-]+(\.[a-z0-9]+)?$/;
 
 export class CreateDocumentDto {
   @IsString()

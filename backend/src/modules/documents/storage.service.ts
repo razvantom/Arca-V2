@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import { extname, join } from "path";
 import { DEFAULT_UPLOADS_DIR } from "../../config/uploads.config";
+import { DOCUMENT_MIME_TYPE_EXTENSIONS } from "./dto/create-document.dto";
 
 export interface StoredFile {
   fileUrl: string;
@@ -39,7 +40,13 @@ export class StorageService {
     await fs.mkdir(uploadsDir, { recursive: true });
 
     const rawExtension = extname(file.originalname).toLowerCase();
-    const safeExtension = /^[.][a-z0-9]+$/.test(rawExtension) ? rawExtension : "";
+    const allowedExtensions =
+      DOCUMENT_MIME_TYPE_EXTENSIONS[
+        file.mimetype as keyof typeof DOCUMENT_MIME_TYPE_EXTENSIONS
+      ] ?? [];
+    const safeExtension = allowedExtensions.includes(rawExtension)
+      ? rawExtension
+      : allowedExtensions[0] ?? "";
     const filename = `${randomUUID()}${safeExtension}`;
     const targetPath = join(uploadsDir, filename);
 
