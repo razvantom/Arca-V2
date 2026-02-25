@@ -4,7 +4,7 @@ import { Test } from "@nestjs/testing";
 import { mkdtemp, rm, stat } from "fs/promises";
 import { tmpdir } from "os";
 import { basename, join } from "path";
-import request = require("supertest");
+import * as request from "supertest";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { ScopeGuard } from "../../common/guards/scope.guard";
 import { uploadsConfig } from "../../config/uploads.config";

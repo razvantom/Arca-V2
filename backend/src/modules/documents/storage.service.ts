@@ -58,7 +58,9 @@ export class StorageService {
     } catch (error) {
       try {
         await fs.rm(tempPath, { force: true });
-      } catch {}
+      } catch (cleanupError) {
+        console.warn("Failed to clean up temp upload file", cleanupError);
+      }
       throw new InternalServerErrorException("Failed to save uploaded file", {
         cause: error as Error,
       });
