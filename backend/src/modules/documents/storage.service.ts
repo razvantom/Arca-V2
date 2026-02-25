@@ -38,8 +38,9 @@ export class StorageService {
 
     await fs.mkdir(uploadsDir, { recursive: true });
 
-    const extension = extname(file.originalname);
-    const filename = `${randomUUID()}${extension}`;
+    const rawExtension = extname(file.originalname).toLowerCase();
+    const safeExtension = /^[.][a-z0-9]+$/.test(rawExtension) ? rawExtension : "";
+    const filename = `${randomUUID()}${safeExtension}`;
     const targetPath = join(uploadsDir, filename);
 
     await fs.writeFile(targetPath, file.buffer);
@@ -47,7 +48,7 @@ export class StorageService {
     return {
       fileUrl: `${this.getPublicPath()}/${filename}`,
       mimeType: file.mimetype,
-      sizeBytes: file.buffer.length,
+      sizeBytes: file.size ?? file.buffer.length,
     };
   }
 }

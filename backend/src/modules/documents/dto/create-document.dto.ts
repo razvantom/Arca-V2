@@ -10,6 +10,7 @@ export const ALLOWED_DOCUMENT_MIME_TYPES = [
   "image/png",
   "image/jpeg",
 ] as const;
+export const UPLOADS_FILE_URL_REGEX = /^\/uploads\/[a-f0-9-]+(\.[a-z0-9]+)?$/i;
 
 export class CreateDocumentDto {
   @IsString()
@@ -23,7 +24,7 @@ export class CreateDocumentDto {
   category!: string;
 
   @IsString()
-  @Matches(/^\/uploads\//, { message: "fileUrl must start with /uploads/" })
+  @Matches(UPLOADS_FILE_URL_REGEX, { message: "fileUrl must reference an uploaded file" })
   fileUrl!: string;
 
   @IsString()
