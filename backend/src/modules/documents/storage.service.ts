@@ -59,7 +59,9 @@ export class StorageService {
       try {
         await fs.rm(tempPath, { force: true });
       } catch {}
-      throw new InternalServerErrorException("Failed to save uploaded file");
+      throw new InternalServerErrorException("Failed to save uploaded file", {
+        cause: error as Error,
+      });
     }
 
     return {
