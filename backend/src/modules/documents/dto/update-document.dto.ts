@@ -1,6 +1,6 @@
-import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { IsEnum, IsIn, IsInt, IsOptional, IsString, Matches, Min } from "class-validator";
 import { Type } from "class-transformer";
-import { DocumentScopeType } from "./create-document.dto";
+import { ALLOWED_DOCUMENT_MIME_TYPES, DocumentScopeType } from "./create-document.dto";
 
 export class UpdateDocumentDto {
   @IsOptional()
@@ -17,10 +17,12 @@ export class UpdateDocumentDto {
 
   @IsOptional()
   @IsString()
+  @Matches(/^\/uploads\//, { message: "fileUrl must come from upload endpoint" })
   fileUrl?: string;
 
   @IsOptional()
   @IsString()
+  @IsIn(ALLOWED_DOCUMENT_MIME_TYPES)
   mimeType?: string;
 
   @IsOptional()

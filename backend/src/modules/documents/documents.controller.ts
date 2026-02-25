@@ -1,20 +1,49 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { Request } from "express";
 import { DocumentsService, UserContext } from "./documents.service";
-import { CreateDocumentDto } from "./dto/create-document.dto";
+import { ALLOWED_DOCUMENT_MIME_TYPES, CreateDocumentDto } from "./dto/create-document.dto";
 import { UpdateDocumentDto } from "./dto/update-document.dto";
 import { ListDocumentsDto } from "./dto/list-documents.dto";
+import { StorageService, UploadFile } from "./storage.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { ScopeGuard } from "../../common/guards/scope.guard";
 
 @UseGuards(JwtAuthGuard, ScopeGuard)
 @Controller("/api/v1/documents")
 export class DocumentsController {
-  constructor(private documents: DocumentsService) {}
+  constructor(
+    private documents: DocumentsService,
+    private storage: StorageService,
+  ) {}
 
   @Post()
   create(@Req() req: Request, @Body() dto: CreateDocumentDto) {
     return this.documents.create((req as any).user as UserContext, dto);
+  }
+
+  @Post("upload")
+  @UseInterceptors(FileInterceptor("file"))
+  async upload(@UploadedFile() file: UploadFile) {
+    if (!file) throw new BadRequestException("File is required");
+    if (!ALLOWED_DOCUMENT_MIME_TYPES.includes(file.mimetype as (typeof ALLOWED_DOCUMENT_MIME_TYPES)[number])) {
+      throw new BadRequestException("Unsupported file type");
+    }
+    return this.storage.saveFile(file);
   }
 
   @Get()

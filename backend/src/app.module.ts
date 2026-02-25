@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { ConfigModule } from "@nestjs/config";
+import { uploadsConfig } from "./config/uploads.config";
 import { PrismaModule } from "./prisma/prisma.module";
 import { GeoModule } from "./modules/geo/geo.module";
 import { AuthModule } from "./modules/auth/auth.module";
@@ -12,7 +13,7 @@ import { HealthController } from "./health.controller";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, load: [uploadsConfig] }),
     PrismaModule,
     AuthModule,
     GeoModule,

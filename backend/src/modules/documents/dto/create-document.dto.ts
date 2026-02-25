@@ -1,8 +1,15 @@
 import { DocumentScopeType } from "@prisma/client";
 import { Type } from "class-transformer";
-import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { IsEnum, IsIn, IsInt, IsOptional, IsString, Matches, Min } from "class-validator";
 
 export { DocumentScopeType };
+
+export const ALLOWED_DOCUMENT_MIME_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/png",
+  "image/jpeg",
+] as const;
 
 export class CreateDocumentDto {
   @IsString()
@@ -16,9 +23,11 @@ export class CreateDocumentDto {
   category!: string;
 
   @IsString()
+  @Matches(/^\/uploads\//, { message: "fileUrl must come from upload endpoint" })
   fileUrl!: string;
 
   @IsString()
+  @IsIn(ALLOWED_DOCUMENT_MIME_TYPES)
   mimeType!: string;
 
   @Type(() => Number)
