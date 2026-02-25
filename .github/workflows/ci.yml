@@ -12,10 +12,8 @@ jobs:
         working-directory: backend
     env:
       DATABASE_URL: postgresql://arca:arca@localhost:5432/arca
-      JWT_ACCESS_SECRET: ci-access-secret
-      JWT_REFRESH_SECRET: ci-refresh-secret
-      JWT_ACCESS_EXPIRES_IN: 15m
-      JWT_REFRESH_EXPIRES_IN: 7d
+      JWT_SECRET: ci-test-secret
+      JWT_EXPIRES_IN: 15m
     services:
       postgres:
         image: postgres:16
