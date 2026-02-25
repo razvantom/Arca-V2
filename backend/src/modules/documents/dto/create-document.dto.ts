@@ -10,6 +10,7 @@ export const ALLOWED_DOCUMENT_MIME_TYPES = [
   "image/png",
   "image/jpeg",
 ] as const;
+export const ALLOWED_DOCUMENT_MIME_TYPES_SET = new Set<string>(ALLOWED_DOCUMENT_MIME_TYPES);
 
 export class CreateDocumentDto {
   @IsString()
@@ -23,7 +24,7 @@ export class CreateDocumentDto {
   category!: string;
 
   @IsString()
-  @Matches(/^\/uploads\//, { message: "fileUrl must come from upload endpoint" })
+  @Matches(/^\/uploads\//, { message: "fileUrl must start with /uploads/" })
   fileUrl!: string;
 
   @IsString()

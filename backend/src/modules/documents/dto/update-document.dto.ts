@@ -17,7 +17,7 @@ export class UpdateDocumentDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^\/uploads\//, { message: "fileUrl must come from upload endpoint" })
+  @Matches(/^\/uploads\//, { message: "fileUrl must start with /uploads/" })
   fileUrl?: string;
 
   @IsOptional()
