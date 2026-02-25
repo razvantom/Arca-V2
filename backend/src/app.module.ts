@@ -6,6 +6,7 @@ import { GeoModule } from "./modules/geo/geo.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { AuditModule } from "./modules/audit/audit.module";
 import { MembershipsModule } from "./modules/memberships/memberships.module";
+import { DocumentsModule } from "./modules/documents/documents.module";
 import { AuditInterceptor } from "./common/interceptors/audit.interceptor";
 import { HealthController } from "./health.controller";
 
@@ -17,6 +18,7 @@ import { HealthController } from "./health.controller";
     GeoModule,
     AuditModule,
     MembershipsModule,
+    DocumentsModule,
   ],
   controllers: [HealthController],
   providers: [
