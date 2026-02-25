@@ -23,7 +23,7 @@ import { StorageService, UploadFile } from "./storage.service";
 import { JwtAuthGuard } from "../../common/guards/jwt-auth.guard";
 import { ScopeGuard } from "../../common/guards/scope.guard";
 
-const ALLOWED_DOCUMENT_MIME_TYPES_SET = new Set<string>(ALLOWED_DOCUMENT_MIME_TYPES);
+const ALLOWED_MIME_TYPES = new Set<string>(ALLOWED_DOCUMENT_MIME_TYPES);
 
 @UseGuards(JwtAuthGuard, ScopeGuard)
 @Controller("/api/v1/documents")
@@ -42,7 +42,7 @@ export class DocumentsController {
   @UseInterceptors(FileInterceptor("file"))
   async upload(@UploadedFile() file: UploadFile) {
     if (!file) throw new BadRequestException("File is required");
-    if (!ALLOWED_DOCUMENT_MIME_TYPES_SET.has(file.mimetype)) {
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
       throw new BadRequestException("Unsupported file type");
     }
     return this.storage.saveFile(file);

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
@@ -59,7 +59,7 @@ export class StorageService {
       try {
         await fs.rm(tempPath, { force: true });
       } catch {}
-      throw error;
+      throw new InternalServerErrorException("Failed to save uploaded file");
     }
 
     return {
