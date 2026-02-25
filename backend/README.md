@@ -32,6 +32,11 @@ npx prisma migrate dev
 npm run prisma:seed
 ```
 
+Seed-ul creează și un utilizator admin implicit:
+- email: `admin@arca.local`
+- parolă: `Admin123!`
+- rol: `SUPER_ADMIN` (scope `GLOBAL`)
+
 ## 5) Rulează API
 ```bash
 npm run start:dev

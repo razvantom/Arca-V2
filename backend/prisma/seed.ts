@@ -2,8 +2,11 @@ import { PrismaClient } from "@prisma/client";
 import * as path from "path";
 import * as fs from "fs";
 import * as XLSX from "xlsx";
+import * as bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
+const ADMIN_EMAIL = "admin@arca.local";
+const ADMIN_PASSWORD = "Admin123!";
 
 function slugify(input: string) {
   return input
@@ -16,6 +19,7 @@ function slugify(input: string) {
 
 async function seedRoles() {
   const roles = [
+    { key: "SUPER_ADMIN", name: "Super Admin", scopeType: "GLOBAL", sortOrder: -10 },
     { key: "ADMIN_ARCA", name: "Admini ARCA", scopeType: "GLOBAL", sortOrder: 0 },
 
     { key: "COUNTY_PRESIDENT", name: "Președinte filială", scopeType: "COUNTY", sortOrder: 10 },
@@ -37,6 +41,35 @@ async function seedRoles() {
       where: { key: r.key },
       update: { name: r.name, scopeType: r.scopeType as any, sortOrder: r.sortOrder },
       create: { key: r.key, name: r.name, scopeType: r.scopeType as any, sortOrder: r.sortOrder },
+    });
+  }
+}
+
+async function seedAdminUser() {
+  const role = await prisma.role.findUnique({ where: { key: "SUPER_ADMIN" } });
+  if (!role) throw new Error("SUPER_ADMIN role not found. Run seed roles first.");
+
+  const existing = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });
+  let adminUser = existing;
+  if (!adminUser) {
+    const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 10);
+    adminUser = await prisma.user.create({
+      data: {
+        email: ADMIN_EMAIL,
+        passwordHash,
+        firstName: "Admin",
+        lastName: "User",
+      },
+    });
+  }
+  if (!adminUser) throw new Error("Admin user could not be created.");
+
+  const access = await prisma.accessAssignment.findFirst({
+    where: { userId: adminUser.id, roleId: role.id, endAt: null },
+  });
+  if (!access) {
+    await prisma.accessAssignment.create({
+      data: { userId: adminUser.id, roleId: role.id },
     });
   }
 }
@@ -124,6 +157,7 @@ async function seedGeoFromExcel(excelPath: string) {
 
 async function main() {
   await seedRoles();
+  await seedAdminUser();
 
   const excelPath = path.resolve(process.cwd(), "prisma/data/Judete-UAT-SectiiVOT.xlsx");
   await seedGeoFromExcel(excelPath);
