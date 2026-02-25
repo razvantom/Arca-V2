@@ -22,7 +22,7 @@ cd backend
 npm install
 ```
 
-## 4) Migrate + Seed (Județe/UAT/Localități/Secții de votare)
+## 4) Migrate + Seed (Județe/UAT/Localități/Secții de votare + SUPER_ADMIN)
 Excel-ul trebuie să fie în:
 `backend/prisma/data/Judete-UAT-SectiiVOT.xlsx`
 

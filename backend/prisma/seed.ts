@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import * as bcrypt from "bcrypt";
 import * as path from "path";
 import * as fs from "fs";
 import * as XLSX from "xlsx";
