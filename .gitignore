@@ -19,6 +19,7 @@ mobile/.env
 
 # Prisma
 backend/prisma/dev.db
+backend/uploads/
 
 # OS
 .DS_Store

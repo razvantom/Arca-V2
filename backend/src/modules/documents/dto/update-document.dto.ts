@@ -1,6 +1,10 @@
-import { IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { IsEnum, IsIn, IsInt, IsOptional, IsString, Matches, Min } from "class-validator";
 import { Type } from "class-transformer";
-import { DocumentScopeType } from "./create-document.dto";
+import {
+  ALLOWED_DOCUMENT_MIME_TYPES,
+  DocumentScopeType,
+  UPLOADS_FILE_URL_PATTERN,
+} from "./create-document.dto";
 
 export class UpdateDocumentDto {
   @IsOptional()
@@ -17,10 +21,12 @@ export class UpdateDocumentDto {
 
   @IsOptional()
   @IsString()
+  @Matches(UPLOADS_FILE_URL_PATTERN, { message: "fileUrl must reference an uploaded file" })
   fileUrl?: string;
 
   @IsOptional()
   @IsString()
+  @IsIn(ALLOWED_DOCUMENT_MIME_TYPES)
   mimeType?: string;
 
   @IsOptional()
