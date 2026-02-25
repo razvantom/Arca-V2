@@ -7,7 +7,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
-import { extname, join } from "path";
+import { basename, extname, join } from "path";
 import { DEFAULT_UPLOADS_DIR } from "../../config/uploads.config";
 import { DOCUMENT_MIME_TYPE_EXTENSIONS } from "./dto/create-document.dto";
 
@@ -69,13 +69,12 @@ export class StorageService {
         await fs.rm(tempPath, { force: true });
       } catch (cleanupError) {
         this.logger.warn(
-          `Failed to clean up temp upload file ${tempPath}: ${String(cleanupError)}`,
+          `Failed to clean up temp upload file ${basename(tempPath)}: ${String(cleanupError)}`,
         );
       }
-      throw new InternalServerErrorException(
-        `Failed to save uploaded file '${file.originalname}'`,
-        { cause: error as Error },
-      );
+      throw new InternalServerErrorException("Failed to save uploaded file", {
+        cause: error as Error,
+      });
     }
 
     return {
