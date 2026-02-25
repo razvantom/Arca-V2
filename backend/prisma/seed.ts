@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import * as bcrypt from "bcrypt";
 import * as path from "path";
 import * as fs from "fs";
 import * as XLSX from "xlsx";
@@ -37,6 +38,40 @@ async function seedRoles() {
       where: { key: r.key },
       update: { name: r.name, scopeType: r.scopeType as any, sortOrder: r.sortOrder },
       create: { key: r.key, name: r.name, scopeType: r.scopeType as any, sortOrder: r.sortOrder },
+    });
+  }
+}
+
+async function seedAdminUser() {
+  const adminRole = await prisma.role.findUnique({ where: { key: "ADMIN_ARCA" } });
+  if (!adminRole) throw new Error("ADMIN_ARCA role missing. Run seedRoles first.");
+
+  const passwordHash = await bcrypt.hash("Admin123!", 10);
+  const adminUser = await prisma.user.upsert({
+    where: { email: "admin@arca.local" },
+    update: {
+      passwordHash,
+      firstName: "Admin",
+      lastName: "ARCA",
+      status: "ACTIVE",
+    },
+    create: {
+      email: "admin@arca.local",
+      passwordHash,
+      firstName: "Admin",
+      lastName: "ARCA",
+      status: "ACTIVE",
+    },
+    select: { id: true },
+  });
+
+  const existingAccess = await prisma.accessAssignment.findFirst({
+    where: { userId: adminUser.id, roleId: adminRole.id, endAt: null },
+  });
+
+  if (!existingAccess) {
+    await prisma.accessAssignment.create({
+      data: { userId: adminUser.id, roleId: adminRole.id },
     });
   }
 }
@@ -124,6 +159,7 @@ async function seedGeoFromExcel(excelPath: string) {
 
 async function main() {
   await seedRoles();
+  await seedAdminUser();
 
   const excelPath = path.resolve(process.cwd(), "prisma/data/Judete-UAT-SectiiVOT.xlsx");
   await seedGeoFromExcel(excelPath);

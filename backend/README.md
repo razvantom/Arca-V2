@@ -22,7 +22,7 @@ cd backend
 npm install
 ```
 
-## 4) Migrate + Seed (Județe/UAT/Localități/Secții de votare)
+## 4) Migrate + Seed (Județe/UAT/Localități/Secții de votare + SUPER_ADMIN)
 Excel-ul trebuie să fie în:
 `backend/prisma/data/Judete-UAT-SectiiVOT.xlsx`
 
@@ -31,6 +31,10 @@ Apoi:
 npx prisma migrate dev
 npm run prisma:seed
 ```
+
+Seed-ul creează utilizatorul SUPER_ADMIN:
+- Email: `admin@arca.local`
+- Parolă: `Admin123!`
 
 ## 5) Rulează API
 ```bash
