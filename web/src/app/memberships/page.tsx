@@ -15,6 +15,7 @@ export default function MembershipsPage() {
       <nav style={{ display: "flex", gap: 12, marginBottom: 24 }}>
         <Link href="/dashboard">Dashboard</Link>
         <Link href="/memberships">Memberships</Link>
+        <Link href="/documents">Documents</Link>
       </nav>
       <h1>Memberships</h1>
       <MembershipsClient />
