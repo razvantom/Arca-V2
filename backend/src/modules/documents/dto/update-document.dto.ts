@@ -1,6 +1,10 @@
 import { IsEnum, IsIn, IsInt, IsOptional, IsString, Matches, Min } from "class-validator";
 import { Type } from "class-transformer";
-import { ALLOWED_DOCUMENT_MIME_TYPES, DocumentScopeType, UPLOADS_FILE_URL_REGEX } from "./create-document.dto";
+import {
+  ALLOWED_DOCUMENT_MIME_TYPES,
+  DocumentScopeType,
+  UPLOADS_UUID_FILE_URL_REGEX,
+} from "./create-document.dto";
 
 export class UpdateDocumentDto {
   @IsOptional()
@@ -17,7 +21,7 @@ export class UpdateDocumentDto {
 
   @IsOptional()
   @IsString()
-  @Matches(UPLOADS_FILE_URL_REGEX, { message: "fileUrl must reference an uploaded file" })
+  @Matches(UPLOADS_UUID_FILE_URL_REGEX, { message: "fileUrl must reference an uploaded file" })
   fileUrl?: string;
 
   @IsOptional()

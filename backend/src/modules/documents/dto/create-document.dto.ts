@@ -17,7 +17,7 @@ export const DOCUMENT_MIME_TYPE_EXTENSIONS: Record<(typeof ALLOWED_DOCUMENT_MIME
     "image/png": [".png"],
     "image/jpeg": [".jpg", ".jpeg"],
   };
-export const UPLOADS_FILE_URL_REGEX =
+export const UPLOADS_UUID_FILE_URL_REGEX =
   /^\/uploads\/[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}(\.[a-z0-9]+)?$/;
 
 export class CreateDocumentDto {
@@ -32,7 +32,7 @@ export class CreateDocumentDto {
   category!: string;
 
   @IsString()
-  @Matches(UPLOADS_FILE_URL_REGEX, { message: "fileUrl must reference an uploaded file" })
+  @Matches(UPLOADS_UUID_FILE_URL_REGEX, { message: "fileUrl must reference an uploaded file" })
   fileUrl!: string;
 
   @IsString()

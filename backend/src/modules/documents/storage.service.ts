@@ -56,7 +56,9 @@ export class StorageService {
       await fs.writeFile(tempPath, file.buffer);
       await fs.rename(tempPath, targetPath);
     } catch (error) {
-      await fs.rm(tempPath, { force: true });
+      try {
+        await fs.rm(tempPath, { force: true });
+      } catch {}
       throw error;
     }
 
