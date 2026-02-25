@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
@@ -21,6 +26,8 @@ export interface UploadFile {
 
 @Injectable()
 export class StorageService {
+  private logger = new Logger(StorageService.name);
+
   constructor(private config: ConfigService) {}
 
   getUploadsDir() {
@@ -45,7 +52,9 @@ export class StorageService {
         file.mimetype as keyof typeof DOCUMENT_MIME_TYPE_EXTENSIONS
       ] ?? [];
     if (rawExtension && !allowedExtensions.includes(rawExtension)) {
-      throw new BadRequestException("File extension does not match MIME type");
+      throw new BadRequestException(
+        `File extension ${rawExtension} is not allowed for MIME type ${file.mimetype}`,
+      );
     }
     const safeExtension = rawExtension || allowedExtensions[0] || "";
     const filename = `${randomUUID()}${safeExtension}`;
@@ -59,7 +68,7 @@ export class StorageService {
       try {
         await fs.rm(tempPath, { force: true });
       } catch (cleanupError) {
-        console.warn("Failed to clean up temp upload file", cleanupError);
+        this.logger.warn(`Failed to clean up temp upload file: ${String(cleanupError)}`);
       }
       throw new InternalServerErrorException("Failed to save uploaded file", {
         cause: error as Error,
