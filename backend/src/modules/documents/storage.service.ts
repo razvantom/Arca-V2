@@ -44,13 +44,21 @@ export class StorageService {
       DOCUMENT_MIME_TYPE_EXTENSIONS[
         file.mimetype as keyof typeof DOCUMENT_MIME_TYPE_EXTENSIONS
       ] ?? [];
-    const safeExtension = allowedExtensions.includes(rawExtension)
-      ? rawExtension
-      : allowedExtensions[0] ?? "";
+    if (rawExtension && !allowedExtensions.includes(rawExtension)) {
+      throw new BadRequestException("File extension does not match MIME type");
+    }
+    const safeExtension = rawExtension || allowedExtensions[0] || "";
     const filename = `${randomUUID()}${safeExtension}`;
     const targetPath = join(uploadsDir, filename);
 
-    await fs.writeFile(targetPath, file.buffer);
+    const tempPath = join(uploadsDir, `${filename}.tmp`);
+    try {
+      await fs.writeFile(tempPath, file.buffer);
+      await fs.rename(tempPath, targetPath);
+    } catch (error) {
+      await fs.rm(tempPath, { force: true });
+      throw error;
+    }
 
     return {
       fileUrl: `${this.getPublicPath()}/${filename}`,
