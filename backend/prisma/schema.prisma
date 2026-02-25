@@ -26,6 +26,12 @@ enum MembershipStatus {
   SUSPENDED
 }
 
+enum DocumentScopeType {
+  GLOBAL
+  COUNTY
+  ORG
+}
+
 enum UnitType {
   NATIONAL
   COUNTY
@@ -55,6 +61,7 @@ model User {
   memberships  Membership[]
   approvals    Membership[]    @relation("membership_approver")
   leadership   LeadershipAssignment[]
+  documents    Document[]
 }
 
 model UserProfile {
@@ -123,6 +130,7 @@ model County {
   profiles            UserProfile[]
   accessAssignments   AccessAssignment[]
   leadershipAssignments LeadershipAssignment[]
+  documents           Document[]
 }
 
 model Organization {
@@ -137,6 +145,7 @@ model Organization {
   leadership          LeadershipAssignment[]
   profiles            UserProfile[]
   accessAssignments   AccessAssignment[]
+  documents           Document[]
 
   @@unique([countyId, name])
   @@index([countyId])
@@ -188,6 +197,31 @@ model Membership {
   @@unique([userId, organizationId])
   @@index([organizationId])
   @@index([status])
+}
+
+model Document {
+  id              String            @id @default(uuid())
+  title           String
+  description     String?
+  category        String
+  fileUrl         String
+  mimeType        String
+  sizeBytes       Int
+  scopeType       DocumentScopeType
+  countyId        Int?
+  organizationId  Int?
+  createdByUserId String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  county          County?           @relation(fields: [countyId], references: [id])
+  organization    Organization?     @relation(fields: [organizationId], references: [id])
+  createdBy       User              @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
+
+  @@index([scopeType])
+  @@index([countyId])
+  @@index([organizationId])
+  @@index([createdByUserId])
 }
 
 model LeadershipAssignment {
