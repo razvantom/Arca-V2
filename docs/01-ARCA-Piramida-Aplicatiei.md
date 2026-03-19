@@ -1,4 +1,4 @@
-# ARCA v2 — Piramida aplicației (Structură + Module + Legături)
+### ARCA v2 — Piramida aplicației (Structură + Module + Legături)
 
 ## 1) Obiectiv
 ARCA v2 este o platformă unificată (Web + Android + iOS) pentru organizarea unei structuri naționale pe model piramidal:
